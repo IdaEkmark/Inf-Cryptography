@@ -1,0 +1,57 @@
+Use Enigma-process to find Vigenère keys
+
+One message
+while key and message unknown:
+	divide message into two part at point chosen stochastically
+	do analysis to find out if they are synced
+	if they are synced
+		find key or message
+		=> key or message known 
+	end
+end
+
+Alternatively
+One message
+For i=m/3:2m/3 (or something)
+	divide message into two part at point i
+	do analysis to find out likelihood that they are synced
+	if likelihood > max_likelihood:
+		max_likelihood = likelihood
+		part1_max = part1
+		part2_max = part2
+	end
+end
+Use part1_max and part2_max to find message
+If message is intelligable yay
+Else choose next likelihood
+
+
+
+Vi använder bok-metoden för att hitta längden på nyckeln
+När vi har hittat längden på nyckeln använder vi statistik för att hitta nyckeln
+- kollar på bokstäver som alla har samma nyckelbokstav
+- jämför med statistik vi har tagit fram själva
+- på så sätt får vi fram vilken nyckelbokstaven är
+- ex 'e' är den vanligaste bokstaven i engelska, om vi får att den vanligaste bokstaven bland de som genererats av samma nyckelbokstav är 'l' måste nyckelbokstaven vara 'h'
+
+
+
+
+
+
+
+
+h e l l o h e l l o h e l l o h e l l o h e l
+w e l o v e i n f o r m a t i o n t h e o r y
+d i w z j l m y q c y q l e w v r e s s v v j
+
+
+
+d i w z j
+l m y q c
+y q l e w
+v r e s s
+
+h h h h
+w e r o
+d l y v
