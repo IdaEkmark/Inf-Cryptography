@@ -1,0 +1,12 @@
+Correlation in the two pieces of message
+
+When finding match probabilty write about markov chain and relation to information theory
+
+Try to relate as much as possible to information theory instead of forcing information theory into the algorithm 
+
+Correlations if possible but might be difficult
+
+Use information theory to get more efficiency
+
+Compare eq 18.24 to Kullback Leibler divergence
+
