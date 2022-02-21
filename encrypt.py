@@ -12,11 +12,15 @@ def main():
     print("Decrypted text check: ", decryptedInput == ''.join(input.split()))
 
 
-def vigenereEncryption(rawInputText, keyword, encrypt=True):
+def vigenereEncryption(rawInputText, keyword, decrypt=False):
     # This function can both encrypt and decrypt according to the Vigenére method.
 
-    alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 
-                'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+    alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+                'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+
+    # Later on, we will include periods and spaces in the input text and encrypt those too
+    # alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+    #             'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', ' ', '.']
 
     # Remove whitespace and convert to only lower case for simplicity
     inputLowerCase = rawInputText.lower()
@@ -35,10 +39,10 @@ def vigenereEncryption(rawInputText, keyword, encrypt=True):
     for i in range(0, inputLength):
         keyLoopIndex = i % keyLength
         inputCharacterIndex = alphabet.index(inputCompact[i])
-        if encrypt:
-            outputCharacterIndex = (inputCharacterIndex + keyCharacterIndices[keyLoopIndex]) % 26
-        else:
+        if decrypt:
             outputCharacterIndex = (inputCharacterIndex - keyCharacterIndices[keyLoopIndex]) % 26
+        else:
+            outputCharacterIndex = (inputCharacterIndex + keyCharacterIndices[keyLoopIndex]) % 26
         outputCharacters[i] = alphabet[outputCharacterIndex]
     
     # Convert character array to string
