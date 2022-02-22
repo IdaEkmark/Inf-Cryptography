@@ -22,6 +22,8 @@ def vigenereEncryption(rawInputText, keyword, decrypt=False):
     # alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
     #             'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', ' ', '.']
 
+    alphabetLength = len(alphabet)
+
     # Remove whitespace and convert to only lower case for simplicity
     inputLowerCase = rawInputText.lower()
     inputCompact = ''.join(inputLowerCase.split())
@@ -40,9 +42,9 @@ def vigenereEncryption(rawInputText, keyword, decrypt=False):
         keyLoopIndex = i % keyLength
         inputCharacterIndex = alphabet.index(inputCompact[i])
         if decrypt:
-            outputCharacterIndex = (inputCharacterIndex - keyCharacterIndices[keyLoopIndex]) % 26
+            outputCharacterIndex = (inputCharacterIndex - keyCharacterIndices[keyLoopIndex]) % alphabetLength
         else:
-            outputCharacterIndex = (inputCharacterIndex + keyCharacterIndices[keyLoopIndex]) % 26
+            outputCharacterIndex = (inputCharacterIndex + keyCharacterIndices[keyLoopIndex]) % alphabetLength
         outputCharacters[i] = alphabet[outputCharacterIndex]
     
     # Convert character array to string
