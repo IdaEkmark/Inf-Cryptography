@@ -6,6 +6,8 @@ path = 'Testing'
 #path = './Grimm stories/Trainingdata_Matches'
 files = glob.glob(path + "/*.txt")
 
+print(str(len(files)))
+'''
 match = 0
 symbols = 0
 for file1 in files:
@@ -22,3 +24,4 @@ for file1 in files:
             match += text1[s] == text2[s]
 print('my estimation is ' + str(5/36))
 print('code thinks  ' + str(match/symbols))
+'''
