@@ -18,7 +18,7 @@ def getMatchContribution():
                 match += text1[s] == text2[s]
 
     m = match/symbols
-    A = len(getAlphabet())
+    A = getAlphabet()[1]
 
     matchContribution = np.log2(m*A)
     nonMatchContribution = np.log2((1-m)*A/(A-1))

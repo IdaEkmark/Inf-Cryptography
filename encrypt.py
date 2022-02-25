@@ -20,8 +20,7 @@ def main():
 def vigenereEncryption(rawInputText, keyword, decrypt=False):
     # This function can both encrypt and decrypt according to the Vigenére method.
 
-    alphabet = getAlphabet()
-    alphabetLength = len(alphabet)
+    alphabet, alphabetLength = getAlphabet()
 
     # Convert all characters to lowercase and whitespace to simple space for simplicity
     inputCompact = simplifyText(rawInputText)
@@ -52,9 +51,8 @@ def vigenereEncryption(rawInputText, keyword, decrypt=False):
 
 def generateRandomKey(keyLength, seedValue=None):
     # Generates a random keyword of chosen length, can set seed so that it remains the same between runs
-    alphabet = getAlphabet()
+    alphabet, alphabetLength = getAlphabet()
 
-    alphabetLength = len(alphabet)
     np.random.seed(seedValue)
     randomIndices = np.random.randint(0, alphabetLength, keyLength)
     

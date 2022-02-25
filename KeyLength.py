@@ -18,7 +18,7 @@ def findMatches(message1, message2):
             sum += 1
     return sum, M-sum
 
-def findKeyLength(message, minLength, maxKeyLength=45, nPeaks=10):
+def findKeyLength(message, minLength=400, maxKeyLength=45, nPeaks=10):
     messageLength = len(message)
     
     matchContribution, nonMatchContribution = getMatchContribution()
@@ -32,7 +32,7 @@ def findKeyLength(message, minLength, maxKeyLength=45, nPeaks=10):
     
     iPeaks = (-logEvidence_list).argsort()[:nPeaks] # Find index of nPeaks largest peaks
     nNonMostFrequentModMax = np.inf
-    for i in range(2, maxKeyLength): # For loop for determining which modulus-operator gives most of one value => key length
+    for i in range(2, maxKeyLength+1): # For loop for determining which modulus-operator gives most of one value => key length
         iModPeak = iPeaks % i
         print('i='+str(i) + ', mod=' + str(iModPeak))
         counts = np.bincount(iModPeak)
@@ -50,7 +50,7 @@ def findKeyLength(message, minLength, maxKeyLength=45, nPeaks=10):
 
 def main():
     text = getText('./Grimm stories/Trainingdata_Statistics/TheOldManAndHisGrandson.txt')
-    message = vigenereEncryption(text, 'somethingreallylong')
+    message = vigenereEncryption(text, 'pneumonoultramicroscopicsilicovolcanoconiosis')
     findKeyLength(message, 400)
     return 0
 
