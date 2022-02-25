@@ -1,6 +1,5 @@
 import numpy as np
-from alphabet import getAlphabet
-from SimplifyText import simplifyText
+from TextHandler import simplifyText, getAlphabet
 
 def main():
     #input = "defend the east wall of the castle"

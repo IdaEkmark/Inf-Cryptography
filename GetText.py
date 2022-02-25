@@ -1,0 +1,1 @@
+from SimplifyText import simplifyText

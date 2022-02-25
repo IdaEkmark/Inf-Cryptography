@@ -2,8 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import glob
 from GetMatchStatistics import getMatchContribution
-from SimplifyText import simplifyText
-from alphabet import getAlphabet
+from TextHandler import getText
 from encrypt import vigenereEncryption
 
 def splitMessage(message, iSplit):
@@ -19,7 +18,7 @@ def findMatches(message1, message2):
             sum += 1
     return sum, M-sum
 
-def findKeyLength(message, minLength):
+def findKeyLength(message, minLength, maxKeyLength=45, nPeaks=10):
     messageLength = len(message)
     
     matchContribution, nonMatchContribution = getMatchContribution()
@@ -31,9 +30,9 @@ def findKeyLength(message, minLength):
         logEvidence_list.append(M*matchContribution + N*nonMatchContribution)
     logEvidence_list = np.array(logEvidence_list)
     
-    iPeaks = (-logEvidence_list).argsort()[:10] # Find index of 10 largest peaks
+    iPeaks = (-logEvidence_list).argsort()[:nPeaks] # Find index of nPeaks largest peaks
     nNonMostFrequentModMax = np.inf
-    for i in range(2, 25): # For loop for determining which modulus-operator gives most of one value => key length
+    for i in range(2, maxKeyLength): # For loop for determining which modulus-operator gives most of one value => key length
         iModPeak = iPeaks % i
         print('i='+str(i) + ', mod=' + str(iModPeak))
         counts = np.bincount(iModPeak)
@@ -50,10 +49,8 @@ def findKeyLength(message, minLength):
     return keylength
 
 def main():
-    with open('./Grimm stories/Testdata/FrederickAndCatherine.txt', 'r', encoding='utf-8') as f:
-        text = f.read()
-    text = simplifyText(text)
-    message = vigenereEncryption(text, 'information')
+    text = getText('./Grimm stories/Trainingdata_Statistics/TheOldManAndHisGrandson.txt')
+    message = vigenereEncryption(text, 'somethingreallylong')
     findKeyLength(message, 400)
     return 0
 
