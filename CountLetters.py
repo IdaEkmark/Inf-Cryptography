@@ -1,7 +1,7 @@
 from collections import Counter
 import glob
 
-path = './Grimm stories'
+path = './Grimm stories/Trainingsdata_Statistics'
 files = glob.glob(path + "/*.txt")
 
 c = Counter()
