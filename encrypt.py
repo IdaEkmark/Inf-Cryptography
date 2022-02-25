@@ -1,4 +1,6 @@
 import numpy as np
+from alphabet import getAlphabet
+from SimplifyText import simplifyText
 
 def main():
     #input = "defend the east wall of the castle"
@@ -7,7 +9,6 @@ def main():
     keyword = "waddup"
     output = vigenereEncryption(input, keyword)
     print("Encrypted text: ", output)
-    print("Encrypted text check: ", output == "sorsqdkp")
 
     decryptedInput = vigenereEncryption(output, keyword, decrypt=True)
     print("Decrypted text: ", decryptedInput)
@@ -20,23 +21,15 @@ def main():
 def vigenereEncryption(rawInputText, keyword, decrypt=False):
     # This function can both encrypt and decrypt according to the Vigenére method.
 
-    alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
-                'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
-
-    # Later on, we will include periods and spaces in the input text and encrypt those too
-    # alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
-    #             'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', ' ', '.']
-
+    alphabet = getAlphabet()
     alphabetLength = len(alphabet)
 
-    # Remove whitespace and convert to only lower case for simplicity
-    inputLowerCase = rawInputText.lower()
-    inputCompact = ''.join(inputLowerCase.split())
-
+    # Convert all characters to lowercase and whitespace to simple space for simplicity
+    inputCompact = simplifyText(rawInputText)
     inputLength = len(inputCompact)
     keyLength = len(keyword)
 
-    # Prepare an array of character indices (i.e. their placement in the alphabet 0-25) for the keyword
+    # Prepare an array of character indices (i.e. their placement in the alphabet) for the keyword
     keyCharacterIndices = [0]*keyLength
     for i in range(0, keyLength):
         keyCharacterIndices[i] = alphabet.index(keyword[i])
@@ -60,8 +53,7 @@ def vigenereEncryption(rawInputText, keyword, decrypt=False):
 
 def generateRandomKey(keyLength, seedValue=None):
     # Generates a random keyword of chosen length, can set seed so that it remains the same between runs
-    alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
-                'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+    alphabet = getAlphabet()
 
     alphabetLength = len(alphabet)
     np.random.seed(seedValue)
