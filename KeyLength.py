@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import glob
-from GetMatchStatistics import getMatchContribution
+from GetStatistics import getMatchContribution
 from TextHandler import getText
 from encrypt import vigenereEncryption
 

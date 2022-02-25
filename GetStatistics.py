@@ -2,6 +2,20 @@ import numpy as np
 import glob
 from TextHandler import getText, getAlphabet
 
+def getLetterStatistics():
+    path = './Grimm stories/Trainingdata_Statistics'
+    files = glob.glob(path + "/*.txt")
+
+    nFiles = len(files)
+    alphabet, A = getAlphabet()
+    distribution = np.zeros(A)
+    for i in range(nFiles):
+        text = getText(files[i])
+        for s in text:
+            distribution[alphabet.index(s)] += 1
+    distribution = distribution/np.sum(distribution)
+    return distribution
+
 def getMatchContribution():
     path = './Grimm stories/Trainingdata_Matches'
     files = glob.glob(path + "/*.txt")
@@ -24,3 +38,4 @@ def getMatchContribution():
     nonMatchContribution = np.log2((1-m)*A/(A-1))
     return matchContribution, nonMatchContribution
 
+print(str(getLetterStatistics()))
