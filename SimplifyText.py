@@ -7,6 +7,5 @@ def simplifyText(text):
     newText = ''.join([c for c in middleText if c in alphabet])
     return newText
 
-
 if __name__ == "__main__":
     main()

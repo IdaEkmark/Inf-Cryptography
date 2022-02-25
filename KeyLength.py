@@ -1,5 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import glob
+from GetMatchStatistics import getMatchContribution
+from SimplifyText import simplifyText
+from alphabet import getAlphabet
+from encrypt import vigenereEncryption
 
 def splitMessage(message, iSplit):
     message1 = message[0:iSplit]
@@ -17,8 +22,7 @@ def findMatches(message1, message2):
 def findKeyLength(message, minLength):
     messageLength = len(message)
     
-    matchContribution = 3.1
-    nonMatchContribution = -0.18
+    matchContribution, nonMatchContribution = getMatchContribution()
     
     logEvidence_list = []
     for iSplit in range(minLength, messageLength-minLength):
@@ -45,9 +49,13 @@ def findKeyLength(message, minLength):
     plt.show()
     return keylength
 
+def main():
+    with open('./Grimm stories/Testdata/FrederickAndCatherine.txt', 'r', encoding='utf-8') as f:
+        text = f.read()
+    text = simplifyText(text)
+    message = vigenereEncryption(text, 'information')
+    findKeyLength(message, 400)
+    return 0
 
 if __name__ == "__main__":
     main()
-
-#message = "whmufllljcqfcdjrfxarbabglfebgmntqyfwhwdbrfbzcoibljhmifyqdxmjoelsedivkrwhmwyjlmkmoovyrkabsroaalfhlmlflsjgmwyogyvswgldsbzcgwijdkaljcfodwphdnjmphqkdlralduiozrkekjghdearkhqkqkrqdjyoqucfocdbbocfmwhincgovwgwmwjcfazwdxltqwruljyjgmvywmgtprwvumdtagrkabarlsidjwozfyqdnmjoonzmoeaqmxctmkvykjcdtcjcvtpwlkebgmnuxsqdcsxsolwxnuekamxsalmqeaslgstanselsudyiyylncfbhrbzcuokcgqtwzgvhwdcwhmygulaofrbglflsbakhwmjcxsmvrrhqkgqgzsrltcvczevlmqtpwguwiqyqdlabwhmapeuaalhsaalwoefyvtpwwfrwkqhdbzckeilfdgialrnbzclreswkouwrkegksupzaqhdbzcgwijdzhwzygeuhrlelgswhqkzdgwxnuekamxsalmqeaaldctwyqsxgrdnlzygnwlrkocyfwtpsrdngglhwwmjgcwecwhmjcvotsrhtpwcyevaljscfqkovwssovlfhbzajoiifrvtwfcvtpwwjlqlrhrmvyqdahyuktwbzibzyolkgjruzkqrbmsswinmjoybzywtpwakitvphnalmrdalgolifbvtijcgablfhmezwgoggsvtifbjaxaljtpwphczacgtpwbzazxyqdpaqdspwljrmqddcmtcfauwarpxwpuelogwhzsehhmoyvsbajoccjqlnoofhnidmxdojmzlqfezaazcdrlslgajdyfkjwyuciecwrwlrlnolmzazvqwhmemxtwxrkengphsblfhdespisxjyqgchgqanjgjhbtswhmumxllfmwrmsakhqkadvmxmutpwzhazoyvatjcddgujrsmlfhnqfrkeljcddwxflspwyutpwauimvbhazepeeijqsazwkhieajogqncbocsjomglphaamphstgmntpwzhaclgiutbczetkjbivyrkezweuavlkhmgdgieezywdwqmxwifrzibzqxcpsqoevvculqlroenwjooesqlywmurutvlrtnwcommtcwwmwlbocjrhebzarmmlynebzcvebomzikccggqjjvtpwwdrmlcqdmjkrrawjvfwjwrunsrdsggsqgymyllaxmummjabsasiheilrkeulfhbmspwowclrhmwbrfpaqzozvqeubyyyebzczikccgczwywuzwyvivyjhbtguzibzflsxsudnlzcgilfmwmwncdgial"
-#findKeyLength(message, 400)
