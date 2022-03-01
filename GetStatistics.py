@@ -38,4 +38,9 @@ def getMatchContribution():
     nonMatchContribution = np.log2((1-m)*A/(A-1))
     return matchContribution, nonMatchContribution
 
-print(str(getLetterStatistics()))
+def main():
+    print(str(getLetterStatistics()))
+    return 0
+
+if __name__ == "__main__":
+    main()
