@@ -5,6 +5,8 @@ from GetStatistics import getMatchContribution
 from TextHandler import getText
 from encrypt import vigenereEncryption
 
+plt.rcParams['font.size'] = 16
+
 def splitMessage(message, iSplit):
     message1 = message[0:iSplit]
     message2 = message[iSplit:]
@@ -43,8 +45,10 @@ def findKeyLength(message, minLength=400, maxKeyLength=45, nPeaks=10):
             keylength = i
 
     print('Key length is '+str(keylength))
-    plt.plot(np.arange(len(logEvidence_list)), logEvidence_list)
-    plt.plot(np.arange(len(logEvidence_list))[iPeaks], logEvidence_list[iPeaks], 'ks')
+    plt.plot(np.arange(minLength, messageLength-minLength), logEvidence_list)
+    plt.plot(np.arange(minLength, messageLength-minLength), logEvidence_list[iPeaks], 'ko')
+    plt.xlabel(r'Breakpoint-index')
+    plt.xlabel(r'Log-evidence')
     plt.show()
     return keylength
 

@@ -16,6 +16,13 @@ def getLetterStatistics():
     distribution = distribution/np.sum(distribution)
     return distribution
 
+def getLetterStatisticsInText(text):
+    alphabet, A = getAlphabet()
+    distribution = np.zeros(A)
+    for s in text:
+        distribution[alphabet.index(s)] += 1
+    return distribution/np.sum(distribution)
+
 def getMatchContribution():
     path = './Grimm stories/Trainingdata_Matches'
     files = glob.glob(path + "/*.txt")

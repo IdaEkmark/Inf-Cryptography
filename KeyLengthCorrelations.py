@@ -1,16 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import glob
+import scipy.signal as sgn
 from TextHandler import getText, getAlphabet
 from encrypt import vigenereEncryption
-import scipy.signal as sgn
+from GetStatistics import getLetterStatisticsInText
 
-def getLetterStatisticsInText(text):
-    alphabet, A = getAlphabet()
-    distribution = np.zeros(A)
-    for s in text:
-        distribution[alphabet.index(s)] += 1
-    return distribution/np.sum(distribution)
+plt.rcParams['font.size'] = 16
 
 def get2SymbolSequenceDistributionInText(text):
     alphabet, A = getAlphabet()
@@ -59,12 +55,14 @@ def findKeyLengthCorrelations(message, maxKeyLength=45):
     print('Key length is ' + str(keylength))
     plt.plot(np.linspace(2,maxKeyLength+1, maxKeyLength), k2_list)
     plt.plot(np.arange(2, len(k2_list)+3)[iPeaks], k2_list[iPeaks], 'ro')
+    plt.xlabel(r'Distance between two subsequent subtext-letters in original text')
+    plt.xlabel(r'$k_2$ for subtext')
     plt.show()
 
 def main():
     #text = getText('./Grimm stories/Testdata/IronHans.txt')
     text = getText('./Grimm stories/Testdata/TheFoxAndTheHorse.txt')
-    message = vigenereEncryption(text, 'pneumonoultramicroscopicsilicovolcanoconiosis')
+    message = vigenereEncryption(text, 'information')
     findKeyLengthCorrelations(message)
     return 0
 
