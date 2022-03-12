@@ -51,17 +51,19 @@ def vigenereEncryption(rawInputText, keyword, decrypt=False):
 
 def generateRandomKey(keyLength, seedValue=None):
     # Generates a random keyword of chosen length, can set seed so that it remains the same between runs
-    alphabet, alphabetLength = getAlphabet()
+    notValidKey = True
+    while notValidKey:
+        alphabet, alphabetLength = getAlphabet()
 
-    np.random.seed(seedValue)
-    randomIndices = np.random.randint(0, alphabetLength, keyLength)
-    
-    randomKeyArray = ['a'] * keyLength
-    for i in range(0, keyLength):
-        randomKeyArray[i] = alphabet[randomIndices[i]]
-    randomKeyString = ''.join(randomKeyArray)
+        np.random.seed(seedValue)
+        randomIndices = np.random.randint(0, alphabetLength, keyLength)
 
-    return randomKeyString
+        randomKeyArray = ['a'] * keyLength
+        for i in range(0, keyLength):
+            randomKeyArray[i] = alphabet[randomIndices[i]]
+        randomKeyString = ''.join(randomKeyArray)
+        if randomKeyString != keyLength * randomKeyString[0]:
+            return randomKeyString
 
 
 if __name__ == "__main__":

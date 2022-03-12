@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import glob
 import scipy.signal as sgn
 from TextHandler import getText, getAlphabet
-from encrypt import vigenereEncryption
+from encrypt import vigenereEncryption, generateRandomKey
 from GetStatistics import getLetterStatisticsInText
 
 plt.rcParams['font.size'] = 16
@@ -37,33 +37,73 @@ def getK2fori(text, i):
 
     return k2
 
-def findKeyLengthCorrelations(message, maxKeyLength=45):
+def findKeyLengthCorrelations(message, maxKeyLength=45, plot=False):
     k2_list = np.zeros(maxKeyLength)
     for i in range(2, maxKeyLength+2):
         k2_list[i-2] = getK2fori(message, i)
-    iPeaks = sgn.find_peaks(-k2_list, threshold=0.2*np.max(k2_list))[0]
+    k2_list_modified = -k2_list/np.log(np.linspace(2,maxKeyLength+1, maxKeyLength))
+    t = 0.3
+    iPeaks = sgn.find_peaks(k2_list_modified, threshold=t * np.max(-k2_list_modified))[0]#threshold=t*np.max(-k2_list_modified))[0]
+    while len(iPeaks) == 0 and t > 0.01:
+        t *= 0.55
+        iPeaks = sgn.find_peaks(k2_list_modified, threshold=t * np.max(-k2_list_modified))[0]
+    #'''
+    if plot:
+        plt.plot(np.linspace(2,maxKeyLength+1, maxKeyLength), k2_list_modified)
+        plt.plot(np.arange(2, len(k2_list)+3)[iPeaks], k2_list_modified[iPeaks], 'ro')
+        plt.xlabel(r'Distance between two subsequent subtext-letters in original text')
+        plt.xlabel(r'$k_2$ for subtext')
+        plt.show()
+    if len(iPeaks) == 0:
+        return -1
     nNonMostFrequentModMax = np.inf
-    for i in range(2, maxKeyLength + 1):  # For loop for determining which modulus-operator gives most of one value => key length
-        iModPeak = iPeaks % i
-        counts = np.bincount(iModPeak)
-        mostFrequentMod = np.argmax(counts)
-        nNonMostFrequentMod = len(np.where(iModPeak != mostFrequentMod)[0])
-        if nNonMostFrequentMod <= nNonMostFrequentModMax:
-            nNonMostFrequentModMax = nNonMostFrequentMod
-            keylength = i
-
-    print('Key length is ' + str(keylength))
-    plt.plot(np.linspace(2,maxKeyLength+1, maxKeyLength), k2_list)
-    plt.plot(np.arange(2, len(k2_list)+3)[iPeaks], k2_list[iPeaks], 'ro')
-    plt.xlabel(r'Distance between two subsequent subtext-letters in original text')
-    plt.xlabel(r'$k_2$ for subtext')
-    plt.show()
+    if len(iPeaks) == 1:
+        keylength = iPeaks[0] + 2
+    else:
+        for i in range(2, maxKeyLength + 1):  # For loop for determining which modulus-operator gives most of one value => key length
+            iModPeak = iPeaks % i
+            counts = np.bincount(iModPeak)
+            mostFrequentMod = np.argmax(counts)
+            nNonMostFrequentMod = len(np.where(iModPeak != mostFrequentMod)[0])
+            if nNonMostFrequentMod <= nNonMostFrequentModMax:
+                nNonMostFrequentModMax = nNonMostFrequentMod
+                keylength = i
+    if plot:
+        print('Key length is ' + str(keylength))
+        plt.plot(np.linspace(2,maxKeyLength+1, maxKeyLength), k2_list)
+        plt.plot(np.arange(2, len(k2_list)+3)[iPeaks], k2_list[iPeaks], 'ro')
+        plt.xlabel(r'Distance between two subsequent subtext-letters in original text')
+        plt.xlabel(r'$k_2$ for subtext')
+        plt.show()
+    return keylength
 
 def main():
-    #text = getText('./Grimm stories/Testdata/IronHans.txt')
-    text = getText('./Grimm stories/Testdata/TheFoxAndTheHorse.txt')
-    message = vigenereEncryption(text, 'information')
-    findKeyLengthCorrelations(message)
+    i = 0
+    e = 0
+    path = './Grimm stories/Trainingdata_Statistics'
+    files = glob.glob(path + "/*.txt")
+    nFiles = len(files)
+    iFile = np.random.randint(nFiles)
+    text = getText(files[iFile])
+    while True:
+        i += 1
+        #print(str(i))
+        #'''
+        if i % 2 == 0:
+            kl = np.random.randint(2, 3)#46)
+        elif i % 2 == 1:
+            kl = np.random.randint(14, 17)
+        else:
+            kl = np.random.randint(30, 46)  # 46)
+        #'''
+        #kl = np.random.randint(2, 46)
+        key = generateRandomKey(kl)
+        message = vigenereEncryption(text, key)
+        klC = findKeyLengthCorrelations(message, plot=True)
+        print('kl = ' + str(kl) + ', found kl = ' + str(klC))
+        if klC != kl:
+            e+= 1
+            print(str(e/i))
     return 0
 
 if __name__ == '__main__':

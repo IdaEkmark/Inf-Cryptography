@@ -20,7 +20,7 @@ def findMatches(message1, message2):
             sum += 1
     return sum, M-sum
 
-def findKeyLength(message, minLength=400, maxKeyLength=45, nPeaks=10):
+def findKeyLengthLogEvidence(message, minLength=400, maxKeyLength=45, nPeaks=10, plot=False):
     messageLength = len(message)
     
     matchContribution, nonMatchContribution = getMatchContribution()
@@ -36,26 +36,26 @@ def findKeyLength(message, minLength=400, maxKeyLength=45, nPeaks=10):
     nNonMostFrequentModMax = np.inf
     for i in range(2, maxKeyLength+1): # For loop for determining which modulus-operator gives most of one value => key length
         iModPeak = iPeaks % i
-        print('i='+str(i) + ', mod=' + str(iModPeak))
+        #print('i='+str(i) + ', mod=' + str(iModPeak))
         counts = np.bincount(iModPeak)
         mostFrequentMod = np.argmax(counts)
         nNonMostFrequentMod = len(np.where(iModPeak != mostFrequentMod)[0])
         if nNonMostFrequentMod <= nNonMostFrequentModMax:
             nNonMostFrequentModMax = nNonMostFrequentMod
             keylength = i
-
-    print('Key length is '+str(keylength))
-    plt.plot(np.arange(minLength, messageLength-minLength), logEvidence_list)
-    plt.plot(np.arange(minLength, messageLength-minLength), logEvidence_list[iPeaks], 'ko')
-    plt.xlabel(r'Breakpoint-index')
-    plt.xlabel(r'Log-evidence')
-    plt.show()
+    if plot:
+        print('Key length is '+str(keylength))
+        plt.plot(np.arange(minLength, messageLength-minLength), logEvidence_list)
+        plt.plot(np.arange(minLength, messageLength-minLength), logEvidence_list[iPeaks], 'ko')
+        plt.xlabel(r'Breakpoint-index')
+        plt.xlabel(r'Log-evidence')
+        plt.show()
     return keylength
 
 def main():
     text = getText('./Grimm stories/Trainingdata_Statistics/TheOldManAndHisGrandson.txt')
     message = vigenereEncryption(text, 'pneumonoultramicroscopicsilicovolcanoconiosis')
-    findKeyLength(message, 400)
+    findKeyLengthLogEvidence(message, 400, plot=True)
     return 0
 
 if __name__ == "__main__":
