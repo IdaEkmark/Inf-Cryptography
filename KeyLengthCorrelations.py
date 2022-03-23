@@ -1,12 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import glob
 import scipy.signal as sgn
 from TextHandler import getText, getAlphabet
 from encrypt import vigenereEncryption, generateRandomKey
 from GetStatistics import getLetterStatisticsInText
 
-plt.rcParams['font.size'] = 16
+FONTSIZE = 12
+mpl.rcParams.update({'font.family': 'serif', 'font.size': FONTSIZE})
 
 def get2SymbolSequenceDistributionInText(text):
     alphabet, A = getAlphabet()
@@ -42,10 +44,11 @@ def findKeyLengthCorrelations(message, maxKeyLength=45, plot=False):
     for i in range(2, maxKeyLength+2):
         k2_list[i-2] = getK2fori(message, i)
     k2_list_modified = -k2_list/np.log(np.linspace(2,maxKeyLength+1, maxKeyLength))
-    t = 0.3
+    t = 0.25
     iPeaks = sgn.find_peaks(k2_list_modified, threshold=t * np.max(-k2_list_modified))[0]#threshold=t*np.max(-k2_list_modified))[0]
+    #print('min=' + str(np.min(k2_list_modified)) + ', max=' + str(np.max(k2_list_modified)))
     while len(iPeaks) == 0 and t > 0.01:
-        t *= 0.55
+        t *= 0.65
         iPeaks = sgn.find_peaks(k2_list_modified, threshold=t * np.max(-k2_list_modified))[0]
     #'''
     if plot:
@@ -54,6 +57,7 @@ def findKeyLengthCorrelations(message, maxKeyLength=45, plot=False):
         plt.xlabel(r'Distance between two subsequent subtext-letters in original text')
         plt.xlabel(r'$k_2$ for subtext')
         plt.show()
+    #'''
     if len(iPeaks) == 0:
         return -1
     nNonMostFrequentModMax = np.inf
@@ -69,41 +73,20 @@ def findKeyLengthCorrelations(message, maxKeyLength=45, plot=False):
                 nNonMostFrequentModMax = nNonMostFrequentMod
                 keylength = i
     if plot:
-        print('Key length is ' + str(keylength))
+        #print('Key length is ' + str(keylength))
         plt.plot(np.linspace(2,maxKeyLength+1, maxKeyLength), k2_list)
-        plt.plot(np.arange(2, len(k2_list)+3)[iPeaks], k2_list[iPeaks], 'ro')
-        plt.xlabel(r'Distance between two subsequent subtext-letters in original text')
-        plt.xlabel(r'$k_2$ for subtext')
+        plt.plot(np.arange(2, len(k2_list)+3)[iPeaks], k2_list[iPeaks], 'ko')
+        plt.xlabel(r'$i$')
+        plt.ylabel(r'$k_2$')
+        plt.savefig('correlations.png')
+        plt.savefig('correlations.pdf')
         plt.show()
     return keylength
 
 def main():
-    i = 0
-    e = 0
-    path = './Grimm stories/Trainingdata_Statistics'
-    files = glob.glob(path + "/*.txt")
-    nFiles = len(files)
-    iFile = np.random.randint(nFiles)
-    text = getText(files[iFile])
-    while True:
-        i += 1
-        #print(str(i))
-        #'''
-        if i % 2 == 0:
-            kl = np.random.randint(2, 3)#46)
-        elif i % 2 == 1:
-            kl = np.random.randint(14, 17)
-        else:
-            kl = np.random.randint(30, 46)  # 46)
-        #'''
-        #kl = np.random.randint(2, 46)
-        key = generateRandomKey(kl)
-        message = vigenereEncryption(text, key)
-        klC = findKeyLengthCorrelations(message, plot=True)
-        print('kl = ' + str(kl) + ', found kl = ' + str(klC))
-        if klC != kl:
-            e+= 1
-            print(str(e/i))
+    text = getText('./Grimm stories/Testdata/TheFoxAndTheHorse.txt')
+    message = vigenereEncryption(text, 'information')
+    klC = findKeyLengthCorrelations(message, plot=True)
     return 0
 
 if __name__ == '__main__':

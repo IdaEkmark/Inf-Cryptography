@@ -1,13 +1,15 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import glob
 from TextHandler import getText, getAlphabet
 from encrypt import vigenereEncryption, generateRandomKey
 from GetStatistics import getLetterStatisticsInText
 
-plt.rcParams['font.size'] = 16
+FONTSIZE = 12
+mpl.rcParams.update({'font.family': 'serif', 'font.size': FONTSIZE})
 
-def getDistributions(m, encrypted, key):
+def getDistributions(m, encrypted, key, s):
     path = './Grimm stories/*'
     files = glob.glob(path + "/*.txt")
     alphabet, A = getAlphabet()
@@ -23,6 +25,8 @@ def getDistributions(m, encrypted, key):
         text = getText(file)
         if encrypted:
             text = vigenereEncryption(text, key)
+        if s > 1:
+            text = text[0::s]
         for k in range(len(text)-m+1):
             subtext_m = text[k:k + m]
             i_m = 0
@@ -65,8 +69,8 @@ def getDistributions(m, encrypted, key):
     return distribution_m, distribution_m1, distribution_m2
 
 
-def getKm(m, encrypted=False, key='a'):
-    distribution_m, distribution_m1, distribution_m2 = getDistributions(m, encrypted, key)
+def getKm(m, encrypted=False, key='a', s=1):
+    distribution_m, distribution_m1, distribution_m2 = getDistributions(m, encrypted, key, s)
 
     path = './Grimm stories/*'
     files = glob.glob(path + "/*.txt")
@@ -77,6 +81,8 @@ def getKm(m, encrypted=False, key='a'):
         text = getText(file)
         if encrypted:
             text = vigenereEncryption(text, key)
+        if s > 1:
+            text = text[0::s]
         for k in range(len(text) - m + 1):
             subtext_m = text[k:k + m]
             i_m = 0
@@ -111,34 +117,74 @@ def getKm(m, encrypted=False, key='a'):
     return k_m
 
 def compareKm(maxKeyLength=45):
+    nKeyWords = 100
+
     k_m_english = np.zeros(5)
-    k_m_vigenere = np.zeros((5,10))
+    k_m_vigenere = np.zeros((5, nKeyWords))
     k_m_vigenere_mean = np.zeros(5)
     k_m_vigenere_std = np.zeros(5)
 
-    keyLength = np.random.randint(2, maxKeyLength + 1, 10)
+    keyLength = np.random.randint(2, maxKeyLength + 1, nKeyWords)
     keys = []
-    for i in range(10):
+    for i in range(nKeyWords):
         keys.append(generateRandomKey(keyLength[i]))
-    print(keys)
     for m in range(2, 7):
+        print('compareKm, m=' + str(m))
         k_m_english[m-2] = getKm(m)
-        print('In standard english k_' + str(int(m)) + '=' + str(np.round_(k_m_english[m - 2], 4)))
-        for i in range(10):
+        for i in range(nKeyWords):
             k_m_vigenere[m-2, i] = getKm(m, encrypted=True, key=keys[i])
         k_m_vigenere_mean[m-2] = np.mean(k_m_vigenere[m - 2,:])
         k_m_vigenere_std[m - 2] = np.std(k_m_vigenere[m - 2, :])
-        print('In vigenere english k_' + str(int(m)) + '=' + str(np.round_(k_m_vigenere_mean[m-2], 4)))
-    plt.plot(np.arange(2, 7), k_m_english, 'o-', color='tab:blue')
-    plt.plot(np.arange(2, 7), k_m_vigenere_mean, 'ko-')
-    plt.plot(np.arange(2, 7), k_m_vigenere_mean + k_m_vigenere_std, 'o--', color='silver')
-    plt.plot(np.arange(2, 7), k_m_vigenere_mean - k_m_vigenere_std, 'o--', color='silver')
-    plt.xlabel(r'$m$')
-    plt.ylabel(r'$k_m$')
-    #plt.title('Key is ' + key)
-    plt.legend(['Original text', 'Mean of encrypted texts', 'Mean of encrypted texts with 1 std'])
+    fig, ax = plt.subplots(1, 1, figsize=(7, 4))
+    ax.plot(np.arange(2, 7), k_m_english, 'o-', color='tab:blue')
+    ax.plot(np.arange(2, 7), k_m_vigenere_mean, 'ko-')
+    ax.plot(np.arange(2, 7), k_m_vigenere_mean + k_m_vigenere_std, 'o--', color='silver')
+    ax.plot(np.arange(2, 7), k_m_vigenere_mean - k_m_vigenere_std, 'o--', color='silver')
+    ax.set_xlabel(r'$m$')
+    ax.set_ylabel(r'$k_m$')
+    ax.set_ylim(bottom=-0.2)
+    ax.legend(['Original text', 'Mean of encrypted texts', 'Mean of encrypted texts with 1 std'], frameon=False)
+    plt.savefig('km.pdf')
+    plt.savefig('km.png')
     plt.show()
 
+def compareKmWithSkip(maxKeyLength=45):
+    nKeyWords = 100
+
+    k_m_vigenere_s = np.zeros((5,nKeyWords))
+    k_m_vigenere_s_mean = np.zeros(5)
+    k_m_vigenere_s_std = np.zeros(5)
+    k_m_vigenere_k = np.zeros((5,nKeyWords))
+    k_m_vigenere_k_mean = np.zeros(5)
+    k_m_vigenere_k_std = np.zeros(5)
+
+    keyLength = np.random.randint(2, maxKeyLength + 1, nKeyWords)
+    s = np.random.randint(2, maxKeyLength + 1, nKeyWords)
+    for w in range(nKeyWords):
+        while s[w] == keyLength[w] or s[w] % keyLength[w] == 0 or keyLength[w] % s[w] == 0:
+            s[w] = np.random.randint(2, maxKeyLength + 1)
+    keys = []
+    for i in range(nKeyWords):
+        keys.append(generateRandomKey(keyLength[i]))
+    for m in range(2, 7):
+        print('compareKmWithSkip, m=' + str(m))
+        for i in range(nKeyWords):
+            k_m_vigenere_k[m - 2, i] = getKm(m, encrypted=True, key=keys[i], s=keyLength[i])
+            k_m_vigenere_s[m - 2, i] = getKm(m, encrypted=True, key=keys[i], s=s[i])
+        k_m_vigenere_k_mean[m - 2] = np.mean(k_m_vigenere_k[m - 2, :])
+        k_m_vigenere_k_std[m - 2] = np.std(k_m_vigenere_k[m - 2, :])
+        k_m_vigenere_s_mean[m - 2] = np.mean(k_m_vigenere_s[m - 2, :])
+        k_m_vigenere_s_std[m - 2] = np.std(k_m_vigenere_s[m - 2, :])
+    fig, ax = plt.subplots(1, 1, figsize=(5.5, 4))
+    ax.plot(np.arange(2, 7), k_m_vigenere_k_mean, 's-', color='tab:blue')
+    ax.plot(np.arange(2, 7), k_m_vigenere_s_mean, 'ko-')
+    ax.set_xlabel(r'$m$')
+    ax.set_ylabel(r'$k_m$')
+    ax.set_ylim(bottom=-0.6)
+    ax.legend(['Mean when only having letters in the same state', 'Mean when having letters in differents states'], frameon=False)
+    plt.savefig('km_with_skip.pdf')
+    plt.savefig('km_with_skip.png')
+    plt.close()
 
 def getEntropy(text):
     letterDistribution = getLetterStatisticsInText(text)
@@ -163,11 +209,14 @@ def compareEntropy(maxKeyLength=45):
         key = generateRandomKey(keyLength)
         text_vigenere = vigenereEncryption(text, key)
         s_vigenere_list[i] = getEntropy(text_vigenere)
+    print(str(np.mean(s_original_list)))
+    print(str(np.mean(s_vigenere_list)))
     plt.plot(s_original_list)
-    plt.plot(1.2*s_original_list)
     plt.plot(s_vigenere_list)
-    plt.legend(['s_original', '1.2s_original', 's_vigenere'])
+    plt.legend(['Original text', 'Vigenère encrypted text'])
+    plt.ylim(bottom=0)
     plt.show()
 
 #compareEntropy()
-compareKm(10)
+compareKmWithSkip(20)
+#compareKm(20)
